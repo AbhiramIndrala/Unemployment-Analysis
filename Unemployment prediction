@@ -1,0 +1,119 @@
+#Importing all the modules
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import datetime as dt
+import calendar
+import plotly.express as px
+
+
+
+#Loading the dataset
+df=pd.read_csv("https://raw.githubusercontent.com/amankharwal/Website-data/master/unemployment.csv")
+df.head(1)
+
+
+
+#Exploraotary DataAnalysis
+df.columns=["States","Date","Frequency","Estimated Unemployment","Estimated Employed","Estimated Labour Participated","Region","Longitude","Latitude"]
+df.head()
+print(df.shape)
+print(df.size)
+print(df.info())
+df[["Region","Estimated Unemployment","Estimated Employed","Estimated Labour Participated"]].describe()
+
+#Converting the datetime
+df["Date"]=pd.to_datetime(df["Date"],dayfirst=True)
+df["Month Number"]=df["Date"].dt.month
+df["Month Number"]=df["Month Number"].apply(lambda x:int(x))
+df["Month Name"]=df["Month Number"].apply(lambda x:calendar.month_abbr[x])
+
+#Droping the Date column
+df.drop("Date",axis=1,inplace=True)
+df["Frequency"]=df["Frequency"].astype("category")
+df["Region"]=df["Region"].astype("category")
+df.head()
+
+
+
+
+
+
+# Data Anlysis
+
+#Estimated Employed
+sns.heatmap(df.corr(),cbar=True,linewidth=1)
+#pairplot
+sns.pairplot(df,hue="States",diag_kind="hist")
+
+#Estimated Employed
+plt.figure(figsize=(16,8))
+sns.distplot(df["Estimated Unemployment"])
+plt.show()
+
+plt.title("Indian Enemployment")
+sns.histplot(x="Estimated Employed",hue="States",data=df, palette="Set1")
+plt.show()
+
+fig=px.box(df,x="States",y="Estimated Employed",color="States",template="plotly")
+fig.show()
+
+plt.figure(figsize=(42,8))
+sns.barplot(x="States",y="Estimated Unemployment",data=df)
+plt.show()
+
+employed=df[["States","Region","Estimated Employed"]]
+fig=px.sunburst(employed,path=["Region","States"],height=700,width=700,color_continuous_scale="RdYlGn")
+fig.show()
+
+
+
+
+
+#Estimated Unemployment
+plt.figure(figsize=(16,8))
+sns.distplot(df["Estimated Unemployment"],color="maroon")
+plt.show()
+
+plt.title("Idian Unemployment")
+sns.histplot(hue="States",x="Estimated Unemployment",data=df, palette="YlGnBu")
+plt.show()
+
+fig=px.box(df,x="States",y="Estimated Unemployment",color="States", template="plotly")
+fig.show()
+
+#barplot
+plt.figure(figsize=(42,12))
+sns.barplot(x="States",y="Estimated Unemployment",data=df, palette="YlGnBu")
+plt.show()
+
+unemployed=df[["States","Region","Estimated Unemployment"]]
+fig=px.sunburst(unemployed,path=["States","Region"],values="Estimated Unemployment",width=700,height=700,color_continuous_scale="YlGnBu")
+fig.show()
+
+
+
+
+
+
+#Estimated Labour Participation Rate
+plt.figure(figsize=(12,6))
+sns.distplot(df["Estimated Labour Participated"],color="g")
+plt.show()
+
+plt.title("Estimated Labour Participated Rate")
+sns.histplot(x="Estimated Labour Participated",hue="States",data=df, palette="viridis")
+plt.show()
+
+fig=px.box(df,x="States",y="Estimated Labour Participated",color="States",template="plotly")
+fig.show()
+
+plt.figure(figsize=(42,12))
+plt.title("Estimated Labour Participated Rate")
+sns.barplot(x="States",y="Estimated Labour Participated",data=df, palette="viridis")
+plt.show()
+
+labour=df[["States","Region","Estimated Labour Participated"]]
+fig=px.sunburst(labour,path=["Region","States"],values="Estimated Labour Participated",width=700,height=700,color_continuous_scale="viridis")
+fig.show()
